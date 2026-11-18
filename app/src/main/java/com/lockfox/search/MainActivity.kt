@@ -32,6 +32,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.lockfox.search.data.FoxIndexRepository
 import com.lockfox.search.model.Category
 import com.lockfox.search.model.SearchListItem
+import com.lockfox.search.model.SortOrder
 import com.lockfox.search.ui.SearchAdapter
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -39,6 +40,9 @@ import java.io.File
 
 class MainActivity : AppCompatActivity() {
 
+    private lateinit var mainRootLayout: View
+    private lateinit var llSearchBarContainer: View
+    private lateinit var btnToggleTheme: ImageButton
     private lateinit var etSearch: EditText
     private lateinit var btnClear: ImageButton
     private lateinit var btnFilterCategory: View
@@ -49,6 +53,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var repository: FoxIndexRepository
     private lateinit var adapter: SearchAdapter
 
+    private var isDarkMode: Boolean = false
+    private var currentSortOrder: SortOrder = SortOrder.RELEVANCE
     private var currentFilter: Category = Category.ALL
     private var searchJob: Job? = null
 
@@ -67,6 +73,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        mainRootLayout = findViewById(R.id.mainRootLayout)
+        llSearchBarContainer = findViewById(R.id.llSearchBarContainer)
+        btnToggleTheme = findViewById(R.id.btnToggleTheme)
         etSearch = findViewById(R.id.etSearch)
         btnClear = findViewById(R.id.btnClear)
         btnFilterCategory = findViewById(R.id.btnFilterCategory)
@@ -75,9 +84,14 @@ class MainActivity : AppCompatActivity() {
         rvResults = findViewById(R.id.rvResults)
         tvFooterHint = findViewById(R.id.tvFooterHint)
 
+        val prefs = getSharedPreferences("fox_search_prefs", MODE_PRIVATE)
+        isDarkMode = prefs.getBoolean("is_dark_mode", false)
+        currentSortOrder = if (prefs.getString("sort_order", "relevance") == "date") SortOrder.DATE else SortOrder.RELEVANCE
+
         repository = FoxIndexRepository(this)
         setupRecyclerView()
         setupSearchBar()
+        applyTheme()
         updateFilterUi()
         requestRequiredPermissions()
 
@@ -119,6 +133,12 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupSearchBar() {
         val btnPinWidgetHeader = findViewById<ImageButton>(R.id.btnPinWidgetHeader)
+
+        btnToggleTheme.setOnClickListener {
+            isDarkMode = !isDarkMode
+            getSharedPreferences("fox_search_prefs", MODE_PRIVATE).edit().putBoolean("is_dark_mode", isDarkMode).apply()
+            applyTheme()
+        }
 
         etSearch.requestFocus()
         etSearch.addTextChangedListener(object : TextWatcher {
@@ -168,15 +188,66 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun applyTheme() {
+        if (isDarkMode) {
+            mainRootLayout.setBackgroundColor(Color.parseColor("#000000"))
+            llSearchBarContainer.setBackgroundResource(R.drawable.bg_search_bar_dark)
+            etSearch.setTextColor(Color.WHITE)
+            etSearch.setHintTextColor(Color.parseColor("#9DA2AB"))
+            btnToggleTheme.setImageResource(R.drawable.ic_theme_light)
+            btnToggleTheme.setColorFilter(Color.parseColor("#FDD663"))
+            btnClear.setColorFilter(Color.parseColor("#9DA2AB"))
+            tvFooterHint.setTextColor(Color.parseColor("#70757A"))
+            window.statusBarColor = Color.parseColor("#000000")
+            window.decorView.systemUiVisibility = window.decorView.systemUiVisibility and View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR.inv()
+        } else {
+            mainRootLayout.setBackgroundColor(Color.parseColor("#F8F9FA"))
+            llSearchBarContainer.setBackgroundResource(R.drawable.bg_search_bar)
+            etSearch.setTextColor(Color.parseColor("#1F1F1F"))
+            etSearch.setHintTextColor(Color.parseColor("#8E9196"))
+            btnToggleTheme.setImageResource(R.drawable.ic_theme_dark)
+            btnToggleTheme.setColorFilter(Color.parseColor("#5F6368"))
+            btnClear.setColorFilter(Color.parseColor("#5F6368"))
+            tvFooterHint.setTextColor(Color.parseColor("#9AA0A6"))
+            window.statusBarColor = Color.parseColor("#F8F9FA")
+            window.decorView.systemUiVisibility = window.decorView.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+        }
+        adapter.isDarkMode = isDarkMode
+    }
+
     private fun showCategoryMenu(anchor: View) {
         val popup = PopupMenu(this, anchor)
         filterOrder.forEachIndexed { index, cat ->
-            val prefix = if (cat == currentFilter) "✓ " else ""
+            val prefix = if (cat == currentFilter) "✓ " else "  "
             popup.menu.add(0, index, index, "$prefix${cat.getLocalizedTitle(this)}")
         }
+
+        val sortRelevanceId = 100
+        val sortDateId = 101
+        val relevancePrefix = if (currentSortOrder == SortOrder.RELEVANCE) "✓ " else "  "
+        val datePrefix = if (currentSortOrder == SortOrder.DATE) "✓ " else "  "
+        popup.menu.add(1, sortRelevanceId, 100, "$relevancePrefix Orden: Relevancia (T9)")
+        popup.menu.add(1, sortDateId, 101, "$datePrefix Orden: Fecha (Recientes)")
+
         popup.setOnMenuItemClickListener { menuItem ->
-            val selected = filterOrder.getOrNull(menuItem.itemId) ?: Category.ALL
-            setCategoryFilter(selected)
+            when (menuItem.itemId) {
+                sortRelevanceId -> {
+                    currentSortOrder = SortOrder.RELEVANCE
+                    getSharedPreferences("fox_search_prefs", MODE_PRIVATE).edit().putString("sort_order", "relevance").apply()
+                    runSearch(etSearch.text.toString())
+                    Toast.makeText(this, "Orden: Relevancia", Toast.LENGTH_SHORT).show()
+                }
+                sortDateId -> {
+                    currentSortOrder = SortOrder.DATE
+                    getSharedPreferences("fox_search_prefs", MODE_PRIVATE).edit().putString("sort_order", "date").apply()
+                    runSearch(etSearch.text.toString())
+                    Toast.makeText(this, "Orden: Por Fecha", Toast.LENGTH_SHORT).show()
+                }
+                else -> {
+                    val selected = filterOrder.getOrNull(menuItem.itemId) ?: Category.ALL
+                    setCategoryFilter(selected)
+                }
+            }
             true
         }
         popup.show()
@@ -213,7 +284,7 @@ class MainActivity : AppCompatActivity() {
     private fun runSearch(query: String) {
         searchJob?.cancel()
         searchJob = lifecycleScope.launch {
-            val results = repository.search(query, currentFilter)
+            val results = repository.search(query, currentFilter, currentSortOrder)
             adapter.submitList(results, query)
             if (adapter.selectedPosition != RecyclerView.NO_POSITION) {
                 rvResults.scrollToPosition(adapter.selectedPosition)
@@ -291,6 +362,18 @@ class MainActivity : AppCompatActivity() {
                     }
                     return true
                 }
+                KeyEvent.KEYCODE_1, KeyEvent.KEYCODE_NUMPAD_1 -> {
+                    if (!etSearch.hasFocus() && handlePhysicalShortcut(1)) return true
+                }
+                KeyEvent.KEYCODE_2, KeyEvent.KEYCODE_NUMPAD_2 -> {
+                    if (!etSearch.hasFocus() && handlePhysicalShortcut(2)) return true
+                }
+                KeyEvent.KEYCODE_3, KeyEvent.KEYCODE_NUMPAD_3 -> {
+                    if (!etSearch.hasFocus() && handlePhysicalShortcut(3)) return true
+                }
+                KeyEvent.KEYCODE_4, KeyEvent.KEYCODE_NUMPAD_4 -> {
+                    if (!etSearch.hasFocus() && handlePhysicalShortcut(4)) return true
+                }
             }
 
             // Teclas físicas numéricas o símbolos en cualquier momento
@@ -304,6 +387,46 @@ class MainActivity : AppCompatActivity() {
             }
         }
         return super.dispatchKeyEvent(event)
+    }
+
+    private fun handlePhysicalShortcut(actionType: Int): Boolean {
+        val selected = adapter.getSelectedItem() ?: return false
+        val targetNumber = when (selected) {
+            is SearchListItem.NumberAction -> selected.number
+            is SearchListItem.Result -> selected.phoneNumber
+            else -> null
+        }
+
+        return when (actionType) {
+            1 -> { // 1: Llamar
+                if (!targetNumber.isNullOrBlank()) {
+                    dialNumber(targetNumber)
+                    true
+                } else false
+            }
+            2 -> { // 2: SMS
+                if (!targetNumber.isNullOrBlank()) {
+                    openFoxMessages(targetNumber, null, null)
+                    true
+                } else false
+            }
+            3 -> { // 3: Copiar
+                if (!targetNumber.isNullOrBlank()) {
+                    copyToClipboard(targetNumber)
+                    true
+                } else if (selected is SearchListItem.Result) {
+                    copyToClipboard(selected.title)
+                    true
+                } else false
+            }
+            4 -> { // 4: Guardar
+                if (!targetNumber.isNullOrBlank()) {
+                    saveContact(targetNumber)
+                    true
+                } else false
+            }
+            else -> false
+        }
     }
 
     private fun executePrimaryAction(item: SearchListItem.Result) {

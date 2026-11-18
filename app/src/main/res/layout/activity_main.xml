@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/mainRootLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#F8F9FA"
@@ -15,6 +16,7 @@
         android:paddingBottom="4dp">
 
         <LinearLayout
+            android:id="@+id/llSearchBarContainer"
             android:layout_width="match_parent"
             android:layout_height="42dp"
             android:background="@drawable/bg_search_bar"
@@ -76,6 +78,16 @@
                 android:textColor="#1F1F1F"
                 android:textColorHint="#8E9196"
                 android:textSize="14.5sp" />
+
+            <ImageButton
+                android:id="@+id/btnToggleTheme"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Cambiar tema claro/oscuro"
+                android:padding="6dp"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_theme_dark" />
 
             <ImageButton
                 android:id="@+id/btnPinWidgetHeader"

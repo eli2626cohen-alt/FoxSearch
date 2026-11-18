@@ -33,6 +33,12 @@ class SearchAdapter(
     var selectedPosition: Int = RecyclerView.NO_POSITION
         private set
 
+    var isDarkMode: Boolean = false
+        set(value) {
+            field = value
+            notifyDataSetChanged()
+        }
+
     companion object {
         private const val TYPE_HEADER = 0
         private const val TYPE_RESULT = 1
@@ -112,10 +118,14 @@ class SearchAdapter(
         private val btnSave: ImageButton = view.findViewById(R.id.btnNumSave)
 
         fun bind(item: SearchListItem.NumberAction, isSelected: Boolean) {
-            container.setBackgroundResource(
-                if (isSelected) R.drawable.bg_item_selected else R.drawable.bg_item_normal
-            )
+            val bgRes = if (isSelected) {
+                if (isDarkMode) R.drawable.bg_item_selected_dark else R.drawable.bg_item_selected
+            } else {
+                if (isDarkMode) R.drawable.bg_item_normal_dark else R.drawable.bg_item_normal
+            }
+            container.setBackgroundResource(bgRes)
             tvNumber.text = item.number
+            tvNumber.setTextColor(if (isDarkMode) Color.WHITE else Color.parseColor("#1F1F1F"))
 
             container.setOnClickListener {
                 updateSelection(bindingAdapterPosition)
@@ -137,15 +147,20 @@ class SearchAdapter(
         private val tvSubtitle: TextView = view.findViewById(R.id.tvActionSubtitle)
 
         fun bind(result: SearchListItem.Result, isSelected: Boolean) {
-            container.setBackgroundResource(
-                if (isSelected) R.drawable.bg_item_selected else R.drawable.bg_item_normal
-            )
+            val bgRes = if (isSelected) {
+                if (isDarkMode) R.drawable.bg_item_selected_dark else R.drawable.bg_item_selected
+            } else {
+                if (isDarkMode) R.drawable.bg_item_normal_dark else R.drawable.bg_item_normal
+            }
+            container.setBackgroundResource(bgRes)
             flBadge.background?.mutate()?.setTint(result.category.bgPastelColor)
             ivIcon.setImageResource(result.category.iconRes)
             ivIcon.setColorFilter(result.category.fgColor)
 
             tvTitle.text = result.title
+            tvTitle.setTextColor(if (isDarkMode) Color.WHITE else Color.parseColor("#1F1F1F"))
             tvSubtitle.text = result.subtitle
+            tvSubtitle.setTextColor(if (isDarkMode) Color.parseColor("#9DA2AB") else Color.parseColor("#5F6368"))
 
             container.setOnClickListener {
                 updateSelection(bindingAdapterPosition)
@@ -158,6 +173,7 @@ class SearchAdapter(
         private val tvHeader: TextView = view.findViewById(R.id.tvHeaderTitle)
         fun bind(header: SearchListItem.Header) {
             tvHeader.text = "${header.category.getLocalizedTitle(itemView.context)} · ${header.count}"
+            tvHeader.setTextColor(if (isDarkMode) Color.parseColor("#8AB4F8") else Color.parseColor("#1A73E8"))
         }
     }
 
@@ -172,9 +188,12 @@ class SearchAdapter(
         private val btnSms: ImageButton = view.findViewById(R.id.btnQuickSms)
 
         fun bind(result: SearchListItem.Result, isSelected: Boolean) {
-            container.setBackgroundResource(
-                if (isSelected) R.drawable.bg_item_selected else R.drawable.bg_item_normal
-            )
+            val bgRes = if (isSelected) {
+                if (isDarkMode) R.drawable.bg_item_selected_dark else R.drawable.bg_item_selected
+            } else {
+                if (isDarkMode) R.drawable.bg_item_normal_dark else R.drawable.bg_item_normal
+            }
+            container.setBackgroundResource(bgRes)
 
             // Identidad pastel sutil
             flBadge.background?.mutate()?.setTint(result.category.bgPastelColor)
@@ -205,6 +224,7 @@ class SearchAdapter(
             }
 
             tvTitle.text = highlightMatch(result.title, currentQuery)
+            tvTitle.setTextColor(if (isDarkMode) Color.WHITE else Color.parseColor("#1F1F1F"))
 
             // Subtítulo secundario únicamente cuando es útil
             if (result.subtitle.isBlank()) {
@@ -212,6 +232,7 @@ class SearchAdapter(
             } else {
                 tvSubtitle.visibility = View.VISIBLE
                 tvSubtitle.text = highlightMatch(result.subtitle, currentQuery)
+                tvSubtitle.setTextColor(if (isDarkMode) Color.parseColor("#9DA2AB") else Color.parseColor("#5F6368"))
             }
 
             // Acciones directas para números/contactos
@@ -252,10 +273,10 @@ class SearchAdapter(
         val start = cleanText.indexOf(cleanQuery)
         if (start < 0 || start + cleanQuery.length > text.length) return text
 
+        val accentColor = if (isDarkMode) Color.parseColor("#8AB4F8") else Color.parseColor("#1A73E8")
         return SpannableString(text).apply {
             setSpan(StyleSpan(Typeface.BOLD), start, start + cleanQuery.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-            // Color de acento de alto contraste para fondo claro
-            setSpan(ForegroundColorSpan(Color.parseColor("#1A73E8")), start, start + cleanQuery.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            setSpan(ForegroundColorSpan(accentColor), start, start + cleanQuery.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
         }
     }
 }
