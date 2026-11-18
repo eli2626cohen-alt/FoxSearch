@@ -9,6 +9,7 @@ import android.provider.CallLog
 import android.provider.ContactsContract
 import android.provider.Telephony
 import androidx.core.content.ContextCompat
+import com.lockfox.search.R
 import com.lockfox.search.engine.CommandParser
 import com.lockfox.search.engine.T9Engine
 import com.lockfox.search.model.Category
@@ -239,7 +240,7 @@ class FoxIndexRepository(private val context: Context) {
                     count++
                     val id = cursor.getString(idIdx) ?: continue
                     val threadId = cursor.getString(threadIdx) ?: ""
-                    val address = cursor.getString(addrIdx) ?: "Desconocido"
+                    val address = cursor.getString(addrIdx) ?: context.getString(R.string.call_unknown)
                     val body = cursor.getString(bodyIdx) ?: ""
                     val dateVal = cursor.getLong(dateIdx)
                     val dateStr = dateFormat.format(Date(dateVal))
@@ -294,12 +295,12 @@ class FoxIndexRepository(private val context: Context) {
                     count++
                     val id = cursor.getString(idIdx) ?: continue
                     val cachedName = cursor.getString(nameIdx)
-                    val number = cursor.getString(numIdx) ?: "Privado"
+                    val number = cursor.getString(numIdx) ?: context.getString(R.string.call_private)
                     val typeLabel = when (cursor.getInt(typeIdx)) {
-                        CallLog.Calls.INCOMING_TYPE -> "Entrante"
-                        CallLog.Calls.OUTGOING_TYPE -> "Saliente"
-                        CallLog.Calls.MISSED_TYPE -> "Perdida"
-                        else -> "Llamada"
+                        CallLog.Calls.INCOMING_TYPE -> context.getString(R.string.call_type_incoming)
+                        CallLog.Calls.OUTGOING_TYPE -> context.getString(R.string.call_type_outgoing)
+                        CallLog.Calls.MISSED_TYPE -> context.getString(R.string.call_type_missed)
+                        else -> context.getString(R.string.call_type_other)
                     }
                     val dateVal = cursor.getLong(dateIdx)
                     val dateStr = dateFormat.format(Date(dateVal))
@@ -343,7 +344,7 @@ class FoxIndexRepository(private val context: Context) {
                         label.equals("Settings", ignoreCase = true)
 
                 val category = if (isSettings) Category.SETTINGS else Category.APP
-                val subtitle = if (isSettings) "Ajustes del sistema" else ""
+                val subtitle = if (isSettings) context.getString(R.string.settings_system) else ""
 
                 val lastUpdateTime = try {
                     pm.getPackageInfo(pkg, 0).lastUpdateTime

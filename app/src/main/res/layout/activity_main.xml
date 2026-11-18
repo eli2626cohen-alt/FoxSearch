@@ -84,7 +84,7 @@
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="Cambiar tema claro/oscuro"
+                android:contentDescription="@string/theme_toggle_desc"
                 android:padding="6dp"
                 android:scaleType="centerInside"
                 android:src="@drawable/ic_theme_dark" />

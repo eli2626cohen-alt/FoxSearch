@@ -12,7 +12,7 @@
     <application
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
-        android:label="Buscar"
+        android:label="@string/app_name"
         android:requestLegacyExternalStorage="true"
         android:supportsRtl="true"
         android:theme="@style/Theme.FoxSearch">
@@ -38,7 +38,7 @@
         <receiver
             android:name=".widget.FoxSearchWidget"
             android:exported="true"
-            android:label="Barra FOX (1 fila)">
+            android:label="@string/widget_search_label">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -51,7 +51,7 @@
         <receiver
             android:name=".widget.FoxClockSearchWidget"
             android:exported="true"
-            android:label="Reloj + Buscador FOX">
+            android:label="@string/widget_clock_label">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>

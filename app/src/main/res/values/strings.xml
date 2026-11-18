@@ -33,4 +33,23 @@
     <string name="category_app">Aplicaciones</string>
     <string name="category_file">Archivos</string>
     <string name="category_settings">Configuración</string>
+    <string name="widget_search_label">Barra FOX (1 fila)</string>
+    <string name="widget_clock_label">FOX Reloj + Buscador</string>
+    <string name="call_type_incoming">Entrante</string>
+    <string name="call_type_outgoing">Saliente</string>
+    <string name="call_type_missed">Perdida</string>
+    <string name="call_type_other">Llamada</string>
+    <string name="call_unknown">Desconocido</string>
+    <string name="call_private">Privado</string>
+    <string name="settings_system">Ajustes del sistema</string>
+    <string name="sort_relevance">Orden: Relevancia (T9)</string>
+    <string name="sort_date">Orden: Fecha (Recientes)</string>
+    <string name="toast_sort_relevance">Orden: Relevancia</string>
+    <string name="toast_sort_date">Orden: Por Fecha</string>
+    <string name="action_copy_text">Copiar texto</string>
+    <string name="action_share">Compartir</string>
+    <string name="action_save_in_contacts">Guardar en Contactos</string>
+    <string name="action_close">Cerrar</string>
+    <string name="no_app_to_open_file">No hay app para abrir este archivo</string>
+    <string name="theme_toggle_desc">Cambiar tema claro/oscuro</string>
 </resources>

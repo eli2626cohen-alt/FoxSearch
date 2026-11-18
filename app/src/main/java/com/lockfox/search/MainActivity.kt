@@ -226,8 +226,8 @@ class MainActivity : AppCompatActivity() {
         val sortDateId = 101
         val relevancePrefix = if (currentSortOrder == SortOrder.RELEVANCE) "✓ " else "  "
         val datePrefix = if (currentSortOrder == SortOrder.DATE) "✓ " else "  "
-        popup.menu.add(1, sortRelevanceId, 100, "$relevancePrefix Orden: Relevancia (T9)")
-        popup.menu.add(1, sortDateId, 101, "$datePrefix Orden: Fecha (Recientes)")
+        popup.menu.add(1, sortRelevanceId, 100, "$relevancePrefix${getString(R.string.sort_relevance)}")
+        popup.menu.add(1, sortDateId, 101, "$datePrefix${getString(R.string.sort_date)}")
 
         popup.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
@@ -235,13 +235,13 @@ class MainActivity : AppCompatActivity() {
                     currentSortOrder = SortOrder.RELEVANCE
                     getSharedPreferences("fox_search_prefs", MODE_PRIVATE).edit().putString("sort_order", "relevance").apply()
                     runSearch(etSearch.text.toString())
-                    Toast.makeText(this, "Orden: Relevancia", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, getString(R.string.toast_sort_relevance), Toast.LENGTH_SHORT).show()
                 }
                 sortDateId -> {
                     currentSortOrder = SortOrder.DATE
                     getSharedPreferences("fox_search_prefs", MODE_PRIVATE).edit().putString("sort_order", "date").apply()
                     runSearch(etSearch.text.toString())
-                    Toast.makeText(this, "Orden: Por Fecha", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, getString(R.string.toast_sort_date), Toast.LENGTH_SHORT).show()
                 }
                 else -> {
                     val selected = filterOrder.getOrNull(menuItem.itemId) ?: Category.ALL
@@ -485,7 +485,7 @@ class MainActivity : AppCompatActivity() {
                     .setTitle(item.title)
                     .setMessage(item.extraData)
                     .setPositiveButton(getString(R.string.action_copy)) { _, _ -> copyToClipboard(item.extraData ?: "") }
-                    .setNegativeButton("Cerrar", null)
+                    .setNegativeButton(getString(R.string.action_close), null)
                     .show()
             }
             Category.FILE -> openLocalFile(item.extraData)
@@ -537,15 +537,15 @@ class MainActivity : AppCompatActivity() {
             }
             startActivity(intent)
         } catch (_: Exception) {
-            Toast.makeText(this, "No hay app para abrir este archivo", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.no_app_to_open_file), Toast.LENGTH_SHORT).show()
         }
     }
 
     private fun showContextMenu(item: SearchListItem.Result) {
-        val options = mutableListOf(getString(R.string.action_copy) + " texto", "Compartir")
+        val options = mutableListOf(getString(R.string.action_copy_text), getString(R.string.action_share))
         if (!item.phoneNumber.isNullOrBlank()) {
-            options.add(getString(R.string.action_copy) + " número (${item.phoneNumber})")
-            options.add(getString(R.string.action_save) + " en Contactos")
+            options.add("${getString(R.string.action_copy)} (${item.phoneNumber})")
+            options.add(getString(R.string.action_save_in_contacts))
         }
 
         AlertDialog.Builder(this)
@@ -558,7 +558,7 @@ class MainActivity : AppCompatActivity() {
                             type = "text/plain"
                             putExtra(Intent.EXTRA_TEXT, "${item.title}: ${item.subtitle}")
                         }
-                        startActivity(Intent.createChooser(share, "Compartir"))
+                        startActivity(Intent.createChooser(share, getString(R.string.action_share)))
                     }
                     2 -> copyToClipboard(item.phoneNumber ?: "")
                     3 -> saveContact(item.phoneNumber ?: "")

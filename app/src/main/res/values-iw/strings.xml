@@ -33,4 +33,23 @@
     <string name="category_app">אפליקציות</string>
     <string name="category_file">קבצים</string>
     <string name="category_settings">הגדרות</string>
+    <string name="widget_search_label">שורת חיפוש FOX</string>
+    <string name="widget_clock_label">שעון + חיפוש FOX</string>
+    <string name="call_type_incoming">שיחה נכנסת</string>
+    <string name="call_type_outgoing">שיחה יוצאת</string>
+    <string name="call_type_missed">שיחה שלא נענתה</string>
+    <string name="call_type_other">שיחה</string>
+    <string name="call_unknown">לא ידוע</string>
+    <string name="call_private">חסוי</string>
+    <string name="settings_system">הגדרות מערכת</string>
+    <string name="sort_relevance">מיון: התאמה (T9)</string>
+    <string name="sort_date">מיון: תאריך (אחרונים)</string>
+    <string name="toast_sort_relevance">מיון לפי התאמה</string>
+    <string name="toast_sort_date">מיון לפי תאריך</string>
+    <string name="action_copy_text">העתקת טקסט</string>
+    <string name="action_share">שיתוף</string>
+    <string name="action_save_in_contacts">שמירה באנשי קשר</string>
+    <string name="action_close">סגור</string>
+    <string name="no_app_to_open_file">אין אפליקציה לפתיחת קובץ זה</string>
+    <string name="theme_toggle_desc">החלפת מצב יום/לילה</string>
 </resources>
