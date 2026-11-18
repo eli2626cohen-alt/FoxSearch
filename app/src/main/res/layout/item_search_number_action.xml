@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/numberActionContainer"
+    android:layout_width="match_parent"
+    android:layout_height="44dp"
+    android:layout_marginBottom="3dp"
+    android:background="@drawable/bg_item_normal"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingStart="8dp"
+    android:paddingEnd="4dp">
+
+    <!-- Badge pastel de teléfono -->
+    <FrameLayout
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:background="@drawable/bg_badge_rounded">
+
+        <ImageView
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_call" />
+    </FrameLayout>
+
+    <!-- Número en negrita destacado -->
+    <TextView
+        android:id="@+id/tvActionNumber"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:ellipsize="end"
+        android:fontFamily="sans-serif-medium"
+        android:maxLines="1"
+        android:paddingStart="8dp"
+        android:paddingEnd="6dp"
+        android:text="253"
+        android:textColor="#1F1F1F"
+        android:textSize="15sp"
+        android:textStyle="bold" />
+
+    <!-- Fila compacta de acciones táctiles e inmediatas -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <!-- Llamar -->
+        <ImageButton
+            android:id="@+id/btnNumCall"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginEnd="3dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/action_call"
+            android:padding="6dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_call" />
+
+        <!-- SMS -->
+        <ImageButton
+            android:id="@+id/btnNumSms"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginEnd="3dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/action_sms"
+            android:padding="6dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_sms" />
+
+        <!-- Copiar -->
+        <ImageButton
+            android:id="@+id/btnNumCopy"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginEnd="3dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/action_copy"
+            android:padding="7dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_copy" />
+
+        <!-- Guardar Contacto -->
+        <ImageButton
+            android:id="@+id/btnNumSave"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/action_save"
+            android:padding="7dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_person_add" />
+    </LinearLayout>
+</LinearLayout>

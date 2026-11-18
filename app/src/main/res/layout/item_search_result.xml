@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/resultContainer"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="3dp"
+    android:background="@drawable/bg_item_normal"
+    android:gravity="center_vertical"
+    android:minHeight="44dp"
+    android:orientation="horizontal"
+    android:paddingStart="8dp"
+    android:paddingTop="5dp"
+    android:paddingEnd="6dp"
+    android:paddingBottom="5dp">
+
+    <!-- Avatar / Badge con fondo pastel de la categoría -->
+    <FrameLayout
+        android:id="@+id/flAvatarBadge"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginEnd="8dp"
+        android:background="@drawable/bg_badge_rounded">
+
+        <ImageView
+            android:id="@+id/ivAvatarIcon"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_gravity="center"
+            android:scaleType="centerInside" />
+
+        <TextView
+            android:id="@+id/tvAvatarInitials"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fontFamily="sans-serif-medium"
+            android:gravity="center"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
+    </FrameLayout>
+
+    <!-- Información principal del resultado -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tvResultTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif-medium"
+            android:maxLines="1"
+            android:textColor="#1F1F1F"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/tvResultSubtitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="1dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="#5F6368"
+            android:textSize="11.5sp" />
+    </LinearLayout>
+
+    <!-- Acciones directas para contactos en la fila -->
+    <ImageButton
+        android:id="@+id/btnQuickCall"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginStart="4dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/action_call"
+        android:padding="6dp"
+        android:scaleType="centerInside"
+        android:src="@drawable/ic_call"
+        android:visibility="gone" />
+
+    <ImageButton
+        android:id="@+id/btnQuickSms"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginStart="3dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/action_sms"
+        android:padding="6dp"
+        android:scaleType="centerInside"
+        android:src="@drawable/ic_sms"
+        android:visibility="gone" />
+</LinearLayout>

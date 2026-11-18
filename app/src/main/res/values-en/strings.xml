@@ -1,0 +1,36 @@
+<resources>
+    <string name="app_name">Search</string>
+    <string name="search_hint">Search in FOX...</string>
+    <string name="widget_description">Universal quick search bar for home screen</string>
+    <string name="widget_clock_description">Digital clock with alarm shortcuts and FOX search bar</string>
+    <string name="footer_hint">▲▼ Move · OK Open · Green Call · ⌫ Back</string>
+    <string name="action_pin_widget_title">Pin search bar to home</string>
+    <string name="action_pin_widget_subtitle">Add widget to main screen</string>
+    <string name="action_calc_subtitle">OK or Tap to copy (%s)</string>
+    <string name="action_create_note">Create quick note</string>
+    <string name="action_send_sms_to">Send SMS to %s</string>
+    <string name="action_open_fox_messages">Open Fox Messages</string>
+    <string name="action_call_to">Call %s</string>
+    <string name="action_call_hint">Green Key, OK or Tap to dial</string>
+    <string name="action_send_sms_direct">Send SMS to %s</string>
+    <string name="action_save_contact">Save contact (%s)</string>
+    <string name="action_save_contact_hint">Add to address book</string>
+    <string name="action_copy_number">Copy number</string>
+    <string name="action_call">Call</string>
+    <string name="action_sms">Message</string>
+    <string name="action_copy">Copy</string>
+    <string name="action_save">Save</string>
+    <string name="filter_tooltip">Filter by category</string>
+    <string name="copied_to_clipboard">Copied to clipboard</string>
+    <string name="note_saved">Note saved</string>
+    <string name="widget_not_supported">Launcher does not support pinning widgets</string>
+    <string name="category_all">All</string>
+    <string name="category_action">Actions</string>
+    <string name="category_contact">Contacts</string>
+    <string name="category_sms">Messages</string>
+    <string name="category_call_log">Calls</string>
+    <string name="category_note">Notes</string>
+    <string name="category_app">Applications</string>
+    <string name="category_file">Files</string>
+    <string name="category_settings">Settings</string>
+</resources>

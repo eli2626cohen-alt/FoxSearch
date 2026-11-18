@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widgetRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    android:paddingStart="6dp"
+    android:paddingTop="8dp"
+    android:paddingEnd="6dp"
+    android:paddingBottom="4dp">
+
+    <!-- SECCIÓN RELOJ (Al tocar abre DeskClock / Alarmas / Cronómetro) -->
+    <LinearLayout
+        android:id="@+id/clockContainer"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <TextClock
+            android:id="@+id/tcTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-light"
+            android:format12Hour="h:mm"
+            android:format24Hour="H:mm"
+            android:includeFontPadding="false"
+            android:textColor="#F1F0F4"
+            android:textSize="50sp" />
+
+        <TextClock
+            android:id="@+id/tcDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:fontFamily="sans-serif-medium"
+            android:format12Hour="E, d MMM"
+            android:format24Hour="E, d MMM"
+            android:includeFontPadding="false"
+            android:textColor="#A8C7FA"
+            android:textSize="12.5sp" />
+    </LinearLayout>
+
+    <!-- SECCIÓN BUSCADOR FOX (Al tocar abre Fox Search) -->
+    <LinearLayout
+        android:id="@+id/searchContainer"
+        android:layout_width="match_parent"
+        android:layout_height="42dp"
+        android:layout_marginTop="6dp"
+        android:layout_marginBottom="4dp"
+        android:background="@drawable/bg_widget_bar"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="12dp"
+        android:paddingEnd="10dp">
+
+        <ImageView
+            android:id="@+id/ivClockSearchIcon"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:contentDescription="@string/app_name"
+            android:src="@drawable/ic_search" />
+
+        <TextView
+            android:id="@+id/tvClockSearchHint"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:singleLine="true"
+            android:text="@string/search_hint"
+            android:textColor="#3C4043"
+            android:textSize="14sp" />
+
+        <!-- Tocar el badge FOX alterna el estilo de fondo del widget -->
+        <TextView
+            android:id="@+id/tvClockWidgetBadge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_header_badge"
+            android:paddingStart="7dp"
+            android:paddingTop="2dp"
+            android:paddingEnd="7dp"
+            android:paddingBottom="2dp"
+            android:text="FOX"
+            android:textColor="#1A73E8"
+            android:textSize="10.5sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+</LinearLayout>

@@ -1,0 +1,36 @@
+<resources>
+    <string name="app_name">Buscar</string>
+    <string name="search_hint">Buscar en FOX...</string>
+    <string name="widget_description">Barra de búsqueda rápida universal para la pantalla de inicio</string>
+    <string name="widget_clock_description">Reloj digital con acceso a alarmas y barra de búsqueda FOX</string>
+    <string name="footer_hint">▲▼ Mover · OK Abrir · Verde Llamar · ⌫ Borrar</string>
+    <string name="action_pin_widget_title">Fijar barra en inicio</string>
+    <string name="action_pin_widget_subtitle">Añadir widget a la pantalla principal</string>
+    <string name="action_calc_subtitle">OK o Tocar para copiar (%s)</string>
+    <string name="action_create_note">Crear nota rápida</string>
+    <string name="action_send_sms_to">Enviar SMS a %s</string>
+    <string name="action_open_fox_messages">Abrir Fox Messages</string>
+    <string name="action_call_to">Llamar a %s</string>
+    <string name="action_call_hint">Tecla Verde, OK o Tocar para marcar</string>
+    <string name="action_send_sms_direct">Enviar SMS a %s</string>
+    <string name="action_save_contact">Guardar contacto (%s)</string>
+    <string name="action_save_contact_hint">Añadir a la libreta de contactos</string>
+    <string name="action_copy_number">Copiar número</string>
+    <string name="action_call">Llamar</string>
+    <string name="action_sms">Mensaje</string>
+    <string name="action_copy">Copiar</string>
+    <string name="action_save">Guardar</string>
+    <string name="filter_tooltip">Filtrar por categoría</string>
+    <string name="copied_to_clipboard">Copiado al portapapeles</string>
+    <string name="note_saved">Nota guardada</string>
+    <string name="widget_not_supported">El launcher no soporta fijar widgets</string>
+    <string name="category_all">Todo</string>
+    <string name="category_action">Acciones</string>
+    <string name="category_contact">Contactos</string>
+    <string name="category_sms">Mensajes</string>
+    <string name="category_call_log">Llamadas</string>
+    <string name="category_note">Notas</string>
+    <string name="category_app">Aplicaciones</string>
+    <string name="category_file">Archivos</string>
+    <string name="category_settings">Configuración</string>
+</resources>

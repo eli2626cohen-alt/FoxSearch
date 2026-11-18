@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Sombra sutil para máxima legibilidad sobre cualquier fondo de pantalla -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M46.5,45.5m-18.5,0a18.5,18.5 0 1,1 37,0a18.5,18.5 0 1,1 -37,0"
+        android:strokeWidth="6"
+        android:strokeColor="#20000000" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M59.5,58.5 L76.5,75.5"
+        android:strokeWidth="7.5"
+        android:strokeLineCap="round"
+        android:strokeColor="#20000000" />
+
+    <!-- Lente de la lupa (Aro azul buscador moderno #1A73E8) -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M46,44m-18.5,0a18.5,18.5 0 1,1 37,0a18.5,18.5 0 1,1 -37,0"
+        android:strokeWidth="5.5"
+        android:strokeColor="#1A73E8" />
+
+    <!-- Reflejo interior del cristal (blanco translúcido estilo lente óptico) -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M37,39 A12,12 0 0,1 47,33"
+        android:strokeWidth="2.2"
+        android:strokeLineCap="round"
+        android:strokeColor="#B0E0FF" />
+
+    <!-- Mango de la lupa (alineado a 45 grados con terminación redondeada) -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M59,57 L76,74"
+        android:strokeWidth="7.0"
+        android:strokeLineCap="round"
+        android:strokeColor="#1A73E8" />
+
+    <!-- Detalle interior del mango para acabado profesional -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M62,60 L73,71"
+        android:strokeWidth="2.5"
+        android:strokeLineCap="round"
+        android:strokeColor="#4285F4" />
+</vector>
