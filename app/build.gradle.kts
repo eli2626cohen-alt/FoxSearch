@@ -1,6 +1,18 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android)
 }
+
+val localProps = Properties().apply {
+    val f = rootProject.file("local.properties")
+    if (f.exists()) load(f.inputStream())
+}
+
+val ksFile = localProps.getProperty("KEYSTORE_FILE") ?: System.getenv("KEYSTORE_FILE")
+val ksPass = localProps.getProperty("KEYSTORE_PASSWORD") ?: System.getenv("KEYSTORE_PASSWORD")
+val kAlias = localProps.getProperty("KEY_ALIAS") ?: System.getenv("KEY_ALIAS")
+val kPass = localProps.getProperty("KEY_PASSWORD") ?: System.getenv("KEY_PASSWORD")
 
 android {
     namespace = "com.lockfox.search"
@@ -10,13 +22,37 @@ android {
         applicationId = "com.lockfox.search"
         minSdk = 26
         targetSdk = 34
-        versionCode = 10
-        versionName = "1.0.9"
+        versionCode = 13
+        versionName = "1.2.1"
+    }
+
+    flavorDimensions += "mode"
+    productFlavors {
+        create("full") {
+            dimension = "mode"
+            versionNameSuffix = "-full"
+        }
+        create("safe") {
+            dimension = "mode"
+            versionNameSuffix = "-safe"
+        }
+    }
+
+    signingConfigs {
+        create("release") {
+            if (!ksFile.isNullOrBlank() && file(ksFile).exists()) {
+                storeFile = file(ksFile)
+                storePassword = ksPass
+                keyAlias = kAlias
+                keyPassword = kPass
+            }
+        }
     }
 
     buildTypes {
         release {
             isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("release")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"

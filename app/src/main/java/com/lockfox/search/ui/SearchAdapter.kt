@@ -268,15 +268,54 @@ class SearchAdapter(
 
     private fun highlightMatch(text: String, query: String): CharSequence {
         val cleanQuery = T9Engine.normalize(query).trim()
-        if (cleanQuery.isEmpty()) return text
+        if (cleanQuery.isEmpty() || text.isEmpty()) return text
+
+        var start = -1
+        var end = -1
+
+        // 1. Coincidencia directa por texto o números
         val cleanText = T9Engine.normalize(text)
-        val start = cleanText.indexOf(cleanQuery)
-        if (start < 0 || start + cleanQuery.length > text.length) return text
+        val directIdx = cleanText.indexOf(cleanQuery)
+        if (directIdx >= 0 && directIdx + cleanQuery.length <= text.length) {
+            start = directIdx
+            end = directIdx + cleanQuery.length
+        } else if (cleanQuery.all { it.isDigit() }) {
+            // 2. Coincidencia por teclado T9 físico (mapeando índices reales en el texto)
+            val range = findT9MatchRange(text, cleanQuery, useAlt = false)
+                ?: findT9MatchRange(text, cleanQuery, useAlt = true)
+            if (range != null) {
+                start = range.first
+                end = range.last + 1
+            }
+        }
+
+        if (start < 0 || end <= start || end > text.length) return text
 
         val accentColor = if (isDarkMode) Color.parseColor("#8AB4F8") else Color.parseColor("#1A73E8")
         return SpannableString(text).apply {
-            setSpan(StyleSpan(Typeface.BOLD), start, start + cleanQuery.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-            setSpan(ForegroundColorSpan(accentColor), start, start + cleanQuery.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            setSpan(StyleSpan(Typeface.BOLD), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            setSpan(ForegroundColorSpan(accentColor), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
         }
+    }
+
+    private fun findT9MatchRange(text: String, digitQuery: String, useAlt: Boolean): IntRange? {
+        val t9Chars = StringBuilder()
+        val origIndices = ArrayList<Int>(text.length)
+
+        for (i in text.indices) {
+            val chStr = text[i].toString()
+            val mapped = if (useAlt) T9Engine.toT9Alt(chStr).ifEmpty { T9Engine.toT9(chStr) } else T9Engine.toT9(chStr)
+            if (mapped.isNotEmpty()) {
+                t9Chars.append(mapped[0])
+                origIndices.add(i)
+            }
+        }
+        val idx = t9Chars.toString().indexOf(digitQuery)
+        if (idx >= 0 && idx + digitQuery.length <= origIndices.size) {
+            val startOrig = origIndices[idx]
+            val endOrig = origIndices[idx + digitQuery.length - 1]
+            return startOrig..endOrig
+        }
+        return null
     }
 }

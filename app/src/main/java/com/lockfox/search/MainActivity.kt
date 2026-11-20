@@ -406,12 +406,17 @@ class MainActivity : AppCompatActivity() {
             }
             2 -> { // 2: SMS
                 if (!targetNumber.isNullOrBlank()) {
-                    openFoxMessages(targetNumber, null, null)
+                    val threadId = if (selected is SearchListItem.Result && selected.category == Category.SMS) selected.extraData?.substringBefore("|") else null
+                    val msgId = if (selected is SearchListItem.Result && selected.category == Category.SMS) selected.id.removePrefix("sms_") else null
+                    openFoxMessages(targetNumber, threadId, null, msgId)
                     true
                 } else false
             }
             3 -> { // 3: Copiar
-                if (!targetNumber.isNullOrBlank()) {
+                if (selected is SearchListItem.Result && selected.category == Category.SMS) {
+                    copyToClipboard(selected.subtitle)
+                    true
+                } else if (!targetNumber.isNullOrBlank()) {
                     copyToClipboard(targetNumber)
                     true
                 } else if (selected is SearchListItem.Result) {
@@ -474,7 +479,13 @@ class MainActivity : AppCompatActivity() {
                 val uri = Uri.withAppendedPath(ContactsContract.Contacts.CONTENT_URI, contactId.toString())
                 startActivity(Intent(Intent.ACTION_VIEW, uri))
             }
-            Category.SMS -> openFoxMessages(item.phoneNumber, item.extraData, null)
+            Category.SMS -> {
+                val threadId = item.extraData?.substringBefore("|")
+                val msgId = item.id.removePrefix("sms_").ifBlank {
+                    item.extraData?.substringAfter("|", "") ?: ""
+                }
+                openFoxMessages(item.phoneNumber, threadId, null, msgId)
+            }
             Category.CALL_LOG -> dialNumber(item.phoneNumber)
             Category.APP -> {
                 val pkg = item.extraData ?: return
@@ -493,18 +504,96 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun openFoxMessages(address: String?, threadId: String?, body: String?) {
-        val intent = Intent(Intent.ACTION_VIEW).apply {
+    private fun openFoxMessages(address: String?, threadId: String?, body: String?, messageId: String? = null) {
+        val msgIdLong = messageId?.toLongOrNull()
+        val threadIdLong = threadId?.toLongOrNull()
+
+        // 1. Intent para FoxMessages (si está instalada - ecosistema Argentina)
+        val foxIntent = Intent(Intent.ACTION_VIEW).apply {
             setPackage("com.lockfox.messages")
             data = Uri.parse("sms:${address ?: ""}")
-            if (!threadId.isNullOrBlank()) putExtra("thread_id", threadId.toLongOrNull())
+            if (threadIdLong != null) {
+                putExtra("thread_id", threadIdLong)
+                putExtra("threadId", threadIdLong)
+            }
+            if (msgIdLong != null) {
+                putExtra("searched_message_id", msgIdLong)
+                putExtra("select_id", msgIdLong)
+                putExtra("message_id", msgIdLong)
+                putExtra("highlight", msgIdLong)
+            }
+            if (!body.isNullOrBlank()) putExtra("sms_body", body)
+        }
+
+        try {
+            startActivity(foxIntent)
+            return
+        } catch (_: Exception) {
+            // FoxMessages no está instalada (por ej. ROM stock o usuarios de Israel)
+        }
+
+        // 2. Intent para la app de SMS por defecto del sistema (Israel / ROM stock)
+        if (msgIdLong != null) {
+            val viewMsgIntent = Intent(Intent.ACTION_VIEW).apply {
+                setDataAndType(Uri.parse("content://sms/$msgIdLong"), "vnd.android-dir/mms-sms")
+                if (threadIdLong != null) {
+                    putExtra("thread_id", threadIdLong)
+                    putExtra("threadId", threadIdLong)
+                }
+                putExtra("searched_message_id", msgIdLong)
+                putExtra("select_id", msgIdLong)
+                putExtra("message_id", msgIdLong)
+                putExtra("highlight", msgIdLong)
+            }
+            try {
+                startActivity(viewMsgIntent)
+                return
+            } catch (_: Exception) {}
+
+            val viewMsgIntent2 = Intent(Intent.ACTION_VIEW).apply {
+                data = Uri.parse("content://sms/$msgIdLong")
+                if (threadIdLong != null) {
+                    putExtra("thread_id", threadIdLong)
+                    putExtra("threadId", threadIdLong)
+                }
+                putExtra("searched_message_id", msgIdLong)
+                putExtra("select_id", msgIdLong)
+                putExtra("message_id", msgIdLong)
+                putExtra("highlight", msgIdLong)
+            }
+            try {
+                startActivity(viewMsgIntent2)
+                return
+            } catch (_: Exception) {}
+        }
+
+        // 3. Fallback estándar si content://sms no es soportado
+        val defaultIntent = Intent(Intent.ACTION_VIEW).apply {
+            data = Uri.parse("sms:${address ?: ""}")
+            if (threadIdLong != null) {
+                putExtra("thread_id", threadIdLong)
+                putExtra("threadId", threadIdLong)
+            }
+            if (msgIdLong != null) {
+                putExtra("searched_message_id", msgIdLong)
+                putExtra("select_id", msgIdLong)
+                putExtra("message_id", msgIdLong)
+                putExtra("highlight", msgIdLong)
+            }
             if (!body.isNullOrBlank()) putExtra("sms_body", body)
         }
         try {
-            startActivity(intent)
+            startActivity(defaultIntent)
         } catch (_: Exception) {
-            intent.setPackage(null)
-            startActivity(intent)
+            val fallback = Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:${address ?: ""}")).apply {
+                if (threadIdLong != null) putExtra("thread_id", threadIdLong)
+                if (msgIdLong != null) putExtra("select_id", msgIdLong)
+            }
+            try {
+                startActivity(fallback)
+            } catch (e: Exception) {
+                Toast.makeText(this, getString(R.string.no_app_to_open_file), Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
@@ -583,13 +672,21 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun requestRequiredPermissions() {
-        val perms = arrayOf(
+        val perms = mutableListOf(
             Manifest.permission.READ_CONTACTS,
-            Manifest.permission.READ_SMS,
             Manifest.permission.READ_CALL_LOG,
-            Manifest.permission.CALL_PHONE,
             Manifest.permission.READ_EXTERNAL_STORAGE
         )
+        try {
+            val requested = packageManager.getPackageInfo(packageName, PackageManager.GET_PERMISSIONS).requestedPermissions
+            if (requested?.contains(Manifest.permission.READ_SMS) == true) {
+                perms.add(Manifest.permission.READ_SMS)
+            }
+            if (requested?.contains(Manifest.permission.CALL_PHONE) == true) {
+                perms.add(Manifest.permission.CALL_PHONE)
+            }
+        } catch (_: Exception) {}
+
         val missing = perms.filter {
             ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED
         }

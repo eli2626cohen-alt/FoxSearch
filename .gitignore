@@ -13,3 +13,4 @@ build/
 app/build/
 app/mipmap-anydpi-v26-bak/
 generate_icons.py
+*.jks

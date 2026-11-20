@@ -23,6 +23,7 @@ import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import java.util.concurrent.ConcurrentHashMap
 
 class FoxIndexRepository(private val context: Context) {
 
@@ -34,17 +35,30 @@ class FoxIndexRepository(private val context: Context) {
     private var cachedFiles = emptyList<SearchListItem.Result>()
     private var cachedNotes = emptyList<SearchListItem.Result>()
 
+    // Caché en memoria para resolución instantánea número -> nombre de contacto
+    private val phoneToContactMap = ConcurrentHashMap<String, String>()
+
     private val dateFormat = SimpleDateFormat("dd/MM HH:mm", Locale.getDefault())
+
+    private fun normalizePhoneNumber(phone: String?): String {
+        if (phone.isNullOrBlank()) return ""
+        val digitsOnly = phone.filter { it.isDigit() }
+        // Últimos 7 dígitos para comparar ignorando prefijos (+972, +54, 05, 11, etc.)
+        return if (digitsOnly.length >= 7) digitsOnly.takeLast(7) else digitsOnly
+    }
 
     suspend fun preloadAll() = coroutineScope {
         val contactsJob = async(Dispatchers.IO) { loadContacts() }
-        val smsJob = async(Dispatchers.IO) { loadRecentSms() }
-        val callsJob = async(Dispatchers.IO) { loadCallLog() }
         val appsJob = async(Dispatchers.IO) { loadInstalledApps() }
         val filesJob = async(Dispatchers.IO) { loadLocalFiles() }
         val notesJob = async(Dispatchers.IO) { loadFoxNotes() }
 
+        // Esperamos a que el mapa de contactos esté listo antes de indexar SMS y llamadas
         cachedContacts = contactsJob.await()
+
+        val smsJob = async(Dispatchers.IO) { loadRecentSms() }
+        val callsJob = async(Dispatchers.IO) { loadCallLog() }
+
         cachedSms = smsJob.await()
         cachedCalls = callsJob.await()
         val allApps = appsJob.await()
@@ -188,6 +202,10 @@ class FoxIndexRepository(private val context: Context) {
                     val name = cursor.getString(nameIdx) ?: "Sin nombre"
                     val number = cursor.getString(numIdx) ?: ""
                     val lastContact = if (lastContactIdx >= 0) cursor.getLong(lastContactIdx) else 0L
+                    val norm = normalizePhoneNumber(number)
+                    if (norm.isNotEmpty()) {
+                        phoneToContactMap[norm] = name
+                    }
                     val key = "$id-$number"
                     if (seen.add(key)) {
                         list.add(
@@ -244,16 +262,19 @@ class FoxIndexRepository(private val context: Context) {
                     val body = cursor.getString(bodyIdx) ?: ""
                     val dateVal = cursor.getLong(dateIdx)
                     val dateStr = dateFormat.format(Date(dateVal))
-                    val combined = "$address $body"
+                    val normAddr = normalizePhoneNumber(address)
+                    val contactName = phoneToContactMap[normAddr]
+                    val displaySender = if (!contactName.isNullOrBlank()) contactName else address
+                    val combined = if (!contactName.isNullOrBlank()) "$contactName $address $body" else "$address $body"
 
                     list.add(
                         SearchListItem.Result(
                             id = "sms_$id",
                             category = Category.SMS,
-                            title = "$address · $dateStr",
+                            title = "$displaySender · $dateStr",
                             subtitle = body.replace("\n", " "),
                             phoneNumber = address,
-                            extraData = threadId,
+                            extraData = "$threadId|$id",
                             t9Signature = T9Engine.toT9(combined),
                             t9AltSignature = T9Engine.toT9Alt(combined),
                             normalizedText = T9Engine.normalize(combined),
@@ -304,7 +325,12 @@ class FoxIndexRepository(private val context: Context) {
                     }
                     val dateVal = cursor.getLong(dateIdx)
                     val dateStr = dateFormat.format(Date(dateVal))
-                    val display = if (!cachedName.isNullOrBlank()) cachedName else number
+                    val resolvedName = if (!cachedName.isNullOrBlank()) {
+                        cachedName
+                    } else {
+                        phoneToContactMap[normalizePhoneNumber(number)]
+                    }
+                    val display = if (!resolvedName.isNullOrBlank()) resolvedName else number
                     val combined = "$display $number $typeLabel"
 
                     list.add(
